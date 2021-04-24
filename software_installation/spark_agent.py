@@ -146,9 +146,12 @@ class Perception:
                 self.acc = [float(v) for v in s[2][1:]]
             elif name == HINGE_JOINT_PERCEPTOR:
                 jointv = {}
+                #print(s)
                 for i in s[1:]:
+                    #print(i)
                     jointv[i[0]] = i[1]
                 name = JOINT_SENSOR_NAMES[jointv['n']]
+                #print(name)
                 if 'ax' in jointv:
                     self.joint[name] = float(jointv['ax']) * DEG_TO_RAD * (-1 if name in INVERSED_JOINTS else 1)
                 if 'tp' in jointv:
@@ -179,6 +182,12 @@ class Perception:
                 angY = atan2(sin(angY), cos(angY))  # normalize
             self.imu = [angX, angY]
 
+    def get_sensor_data(self, joint_name):
+        angle = self.joint[joint_name] 
+        temperature = self.joint_temperature[joint_name]
+        
+        return angle, temperature
+
     def _parse_vision(self, sexp):
         see = {}
         see[VISION_PERCEPTOR_LINE] = []
@@ -202,6 +211,20 @@ class Action(object):
         stiffness = ['(%ss %.2f)' % (JOINT_CMD_NAMES[k], self.stiffness[k]) for k in self.stiffness]
         return ''.join(speed + stiffness)
 
+    # TODO: Move multiple joints at a time 
+    def setSpeed(self, joint_name, speed):
+        for joint_cmd_name in JOINT_CMD_NAMES:
+            if joint_cmd_name == joint_name:
+                self.speed[joint_cmd_name] = speed
+            else:
+                self.speed[joint_cmd_name] = 0
+
+    def setStiffness(self, joint_name, stiffness):
+        for joint_cmd_name in JOINT_CMD_NAMES:
+            if joint_cmd_name == joint_name:
+                self.stiffness[joint_cmd_name] = stiffness
+            else:
+                self.stiffness[joint_cmd_name] = 0
 
 class SparkAgent(object):
     def __init__(self, simspark_ip='localhost',
