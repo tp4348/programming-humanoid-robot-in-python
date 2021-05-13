@@ -52,7 +52,19 @@ class PIDController(object):
         @param sensor: current values from sensor
         @return control signal
         '''
-        # YOUR CODE HERE
+        y = self.y.popleft()
+        e = target - sensor
+        term_1 = self.Kp * (e - self.e1)
+        term_2 = self.Ki * self.dt * e
+        term_3 = self.Kd / self.dt * (e - 2*self.e1 + self.e2) # TODO: Understand this better - The more in the past you go, the lest relevant the error should be?
+        self.u += term_1 + term_2 + term_3 
+
+        self.e2 = self.e1
+        self.e1 = e
+        # print("PID joint errors: e=" + str(e) + " ; e1= " + str(self.e1) + " ; e2= " + str(self.e2))
+        speed = ((self.u - sensor) + (y - sensor)) / (2*self.dt) # TODO: Understand this better - Average of previous predicate and current input but why /dt?
+        predict = self.u + speed*self.dt
+        self.y.append(predict)
 
         return self.u
 
