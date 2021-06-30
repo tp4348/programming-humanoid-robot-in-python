@@ -10,7 +10,8 @@
     3. complete function ForwardKinematicsAgent.forward_kinematics, save the transforms of all body parts in torso
        coordinate into self.transforms of class ForwardKinematicsAgent
 * Hints:
-    the local_trans has to consider different joint axes and link parameters for different joints
+    1. the local_trans has to consider different joint axes and link parameters for different joints
+    2. Please use radians and meters as unit.
 '''
 
 # add PYTHONPATH
@@ -19,12 +20,10 @@ import sys
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'joint_control'))
 
 from numpy.matlib import matrix, identity
-import numpy as np
-import math
-from angle_interpolation import AngleInterpolationAgent
+from recognize_posture import PostureRecognitionAgent
 
 
-class ForwardKinematicsAgent(AngleInterpolationAgent):
+class ForwardKinematicsAgent(PostureRecognitionAgent):
     def __init__(self, simspark_ip='localhost',
                  simspark_port=3100,
                  teamname='DAInamite',
